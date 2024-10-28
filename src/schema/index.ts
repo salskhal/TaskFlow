@@ -30,24 +30,13 @@ export const OTPSchema = z.object({
     }),
 })
 
-// export const CreatePTaskSchema = z.object({
-//     title: z.string().min(1, {
-//         message: "Enter Task title"
-//     }),
-//     description: z.string().min(4, {
-//         message: "Enter Task Description"
-//     }),
-//     date: z.date(),
-//     priority: z.enum(["low", "medium", "high"]).default("low"),
-//     status: z.enum(["todo", "in progress", "completed"]).default("todo"),
-// })
-
-
 
 export const CreatePTaskSchema = z.object({
     title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
-    date: z.date().optional(),
-    priority: z.enum(["low", "medium", "high"]),
+    description: z.string().min(1, "Description is required"),
     status: z.enum(["todo", "in progress", "completed"]),
+    priority: z.enum(["high", "medium", "low"]),
+    date: z.date({
+        required_error: "Please select a date",
+    }),
 });

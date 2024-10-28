@@ -25,13 +25,32 @@ interface ComboBoxProps {
   onWorkspaceChange: (workspaceId: string) => void;
 }
 
+interface Workspace {
+  workspaceId: string;
+  name: string;
+  image?: string;
+}
+
+interface PersonalSpace {
+  value: string;
+  name: string;
+  image: string;
+}
+
+type WorkspaceSelection = Workspace | PersonalSpace;
+
 export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
   const { user } = useAuthStore();
   const [open, setOpen] = useState(false);
   const workspaces = user.workspaces;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { currentWorkspace, setWorkspace } = useWorkspaceStore(); // Use Zustand to track the current workspace
+  const { currentWorkspace, setWorkspace } = useWorkspaceStore(); // Use Zustand to track the current workspace#
+
+  // Guard clause for unauthenticated state
+  if (!user) {
+    return null;
+  }
 
   //   tweaking to make dynamic
   const personalSpace = {
@@ -44,9 +63,12 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
   //   if (value === "personal") return personalSpace;
   //   return workspaces.find((w) => w.workspaceId === value) || personalSpace;
   // };
-  const getCurrentSelection = () => {
+  const getCurrentSelection = (): WorkspaceSelection => {
     if (currentWorkspace === "personal") return personalSpace;
-    return workspaces.find((w) => w.workspaceId === currentWorkspace) || personalSpace;
+    return (
+      workspaces.find((w) => w.workspaceId === currentWorkspace) ||
+      personalSpace
+    );
   };
 
   const currentSelection = getCurrentSelection();
@@ -71,14 +93,14 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
           className="w-[250px] justify-between"
         >
           <div className="flex items-center gap-2">
-            {currentSelection.image ? (
+            {"image" in currentSelection ? (
               <img
                 src={currentSelection.image}
                 alt={currentSelection.name}
                 className="w-4 h-4 rounded-full"
               />
             ) : (
-              <div className="w-4 h-4 rounded-full bg-gray-300"></div> // Optional: Fallback empty avatar
+              <div className="w-4 h-4 rounded-full bg-gray-300" />
             )}
             {currentSelection.name}
           </div>

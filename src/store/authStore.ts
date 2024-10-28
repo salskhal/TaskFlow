@@ -5,10 +5,12 @@ import {
     loginUser, logout
 } from "@/services/auth"
 
+import { User } from "@/types/PTask";
+
 import { useWorkspaceStore } from "./workspaceStore";
 
 interface AuthState {
-    user: null;
+    user: User | null;
     isAuthenticated: boolean;
     loading: boolean,
     error: string | null,

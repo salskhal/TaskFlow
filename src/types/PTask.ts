@@ -1,3 +1,15 @@
+export interface User {
+    firstName: string;
+    lastName: string;
+    profile: string;
+    email: string;
+    workspaces: Array<{
+        workspaceId: string;
+        name: string;
+    }>;
+}
+
+
 export interface SubTask {
     _id: string;
     title: string;
@@ -18,11 +30,13 @@ export interface PersonalTask {
 }
 
 // Create a type for the form input that matches what we're collecting from the user
-export type CreatePersonalTaskInput = Pick<
-    PersonalTask,
-    'title' | 'description' | 'date' | 'priority' | 'status'
->;
-
+export interface CreatePersonalTaskInput {
+    title: string;
+    description: string;
+    status: 'todo' | 'in progress' | 'completed';
+    priority: 'high' | 'medium' | 'low';
+    date: Date;
+}
 
 export interface CreateSubTaskInput {
     title: string;

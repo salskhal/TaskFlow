@@ -30,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+// import * as z from "zod";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import {
@@ -41,26 +41,32 @@ import {
 import { useState } from "react";
 import { CreatePTaskSchema } from "@/schema";
 
-type CreatePTaskInput = z.infer<typeof CreatePTaskSchema>;
+import { CreatePersonalTaskInput } from "@/types/PTask";
+
+// type CreatePTaskInput = z.infer<typeof CreatePTaskSchema>;
+
+type FormData = CreatePersonalTaskInput;
 
 export default function CreatePTask() {
   const [open, setOpen] = useState(false);
   const { addTask, isLoading } = usePersonalTaskStore();
   //   const { toast } = useToast();
 
-  const form = useForm<CreatePTaskInput>({
+  const form = useForm<FormData>({
     resolver: zodResolver(CreatePTaskSchema),
     defaultValues: {
       title: "",
       description: "",
       status: "todo",
       priority: "low",
+      // Add a default date value to match the required schema
+      date: new Date(),
     },
   });
 
-  const onSubmit = async (data: CreatePTaskInput) => {
+  const onSubmit = async (data: FormData) => {
     try {
-      console.log(data);
+      // console.log(data);
       await addTask(data);
       // Handle success (e.g., show toast, close modal)
       setOpen(false);

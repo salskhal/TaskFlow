@@ -6,8 +6,8 @@ import {
 } from "@/services/auth"
 
 import { User } from "@/types/PTask";
-
 import { useWorkspaceStore } from "./workspaceStore";
+import { getToken, getUser } from "@/utils/tokenStorage";
 
 interface AuthState {
     user: User | null;
@@ -67,8 +67,8 @@ export const useAuthStore = create<AuthState>(
                 set({ user: userData, isAuthenticated: true, loading: false });
 
                 // Save user data to localStorage
-                localStorage.setItem("user", JSON.stringify(userData));
-                localStorage.setItem("isAuthenticated", "true");
+                // localStorage.setItem("user", JSON.stringify(userData));
+                // localStorage.setItem("isAuthenticated", "true");
                 console.log(userData)
             } catch (error) {
                 set({ error: error.message, loading: false });
@@ -78,24 +78,33 @@ export const useAuthStore = create<AuthState>(
 
 
         // Logout action
-        logoutUser: () => {
+        logoutUser: async () => {
+            await logout()
             set({ user: null, isAuthenticated: false });
             useWorkspaceStore.getState().setWorkspace("personal") // resert workspace
 
-            // Clear user data from localStorage
-            localStorage.removeItem("user");
-            localStorage.removeItem("isAuthenticated");
-            logout()
         },
 
 
         // Load authentication state from localStorage when app starts
-        loadAuthFromStorage: () => {
-            const userData = localStorage.getItem("user");
-            const isAuthenticated = localStorage.getItem("isAuthenticated");
+        // loadAuthFromStorage: () => {
+        //     const userData = localStorage.getItem("user");
+        //     const isAuthenticated = localStorage.getItem("isAuthenticated");
 
-            if (userData && isAuthenticated === "true") {
-                set({ user: JSON.parse(userData), isAuthenticated: true });
+        //     if (userData && isAuthenticated === "true") {
+        //         set({ user: JSON.parse(userData), isAuthenticated: true });
+        //     }   
+        // },
+
+        loadAuthFromStorage: () => {
+            const token = getToken();
+            const userData = getUser();
+
+            if (token && userData) {
+                set({ user: userData, isAuthenticated: true });
+            } else {
+                // If either token or user data is missing, clear everything
+                set({ user: null, isAuthenticated: false });
             }
         },
 

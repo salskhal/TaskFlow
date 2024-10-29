@@ -1,4 +1,5 @@
 import api from "./api";
+import { setToken, setUser, removeToken, removeUser } from "@/utils/tokenStorage";
 
 export const registerUser = async (data: {
     firstName: string;
@@ -32,8 +33,17 @@ export const loginUser = async (data: {
 }) => {
     try {
         const response = await api.post("/users/login", data)
+
+        const { user } = response.data;
+
+
+        // Store token and user data
+        setToken(user.token)
+        setUser(user)
+
+
         // console.log(response.data)
-        return response.data.user
+        return user
     } catch (error) {
         if (error.response) {
             // Backend responded with an error (invalid credentials, etc.)
@@ -58,6 +68,13 @@ export const loginUser = async (data: {
 
 
 export const logout = async () => {
-    const response = await api.post('/users/logout');
-    return response.data; // Return the success message
+    // const response = await api.post('/users/logout');
+    // return response.data; // Return the success message
+    try {
+        await api.post('/users/logout');
+    } finally {
+        // Clear all auth data
+        removeToken();
+        removeUser();
+    }
 }

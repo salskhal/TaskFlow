@@ -1,4 +1,16 @@
+import { CreateWorkspaceInput } from "@/types/Workspace";
 import api from "./api"
+
+
+export const createWorkspace = async (workspaceData: CreateWorkspaceInput) => {
+    try {
+        const response = await api.post(`/workspaces`, workspaceData)
+
+        return response.data
+    } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to create workspace');
+    }
+}
 
 export const fetchUserWorkspaces = async () => {
     try {
@@ -10,10 +22,10 @@ export const fetchUserWorkspaces = async () => {
 }
 
 export const fetchUserWorkspaceById = async (workspaceId: string) => {
-    try{
+    try {
         const response = await api.get(`/workspaces/${workspaceId}`)
         return response.data
-    } catch(error){
+    } catch (error) {
         throw new Error(error)
     }
 }

@@ -1,11 +1,16 @@
-import { SheetHeader, SheetTitle, SheetContent } from "@/components/ui/sheet";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetContent,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { PersonalTask } from "@/types/PTask";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, Tag, CircleDot, SquareMenu, Trash2 } from "lucide-react";
 import TaskPriority from "./TaskPriority";
 import SubTaskProgress from "./SubTaskProgress";
-// import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 import { usePersonalTaskStore } from "@/store/usePersonalTaskStore";
 import { CreateSubTask } from "./CreateSubTask";
@@ -16,9 +21,8 @@ interface PTaskCardContentProps {
 
 export default function PTaskCardContent({ task }: PTaskCardContentProps) {
   const { title, description, subTasks = [], status, date, priority } = task;
-  const toggleSubtask = usePersonalTaskStore((state) => state.toggleSubtask);
 
-  const { deleteSubtask } = usePersonalTaskStore();
+  const { deleteSubtask, toggleSubtask, deletePTask } = usePersonalTaskStore();
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -34,13 +38,17 @@ export default function PTaskCardContent({ task }: PTaskCardContentProps) {
     await deleteSubtask(task._id, subtaskId);
   };
 
+  const handleDeletePTask = async () => {
+    await deletePTask(task._id);
+  };
+
   return (
     <SheetContent side="right">
       <SheetHeader className="text-left">
         <SheetTitle className="text-2xl">{title}</SheetTitle>
       </SheetHeader>
 
-      <div className="mt-5">
+      <div className="my-5">
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -105,7 +113,10 @@ export default function PTaskCardContent({ task }: PTaskCardContentProps) {
                   {subtask.title}
                 </label>
 
-                <div onClick={() => handleDeleteSubtask(subtask._id)}>
+                <div
+                  onClick={() => handleDeleteSubtask(subtask._id)}
+                  className="cursor-pointer"
+                >
                   <Trash2 className="w-4 text-red-600" />
                 </div>
               </div>
@@ -115,6 +126,12 @@ export default function PTaskCardContent({ task }: PTaskCardContentProps) {
           <CreateSubTask taskId={task._id} />
         </div>
       </div>
+
+      <SheetFooter>
+        <Button className="bg-red-700 hover:bg-red" onClick={handleDeletePTask}>
+          Delete
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 }

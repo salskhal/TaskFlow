@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const OverlappingAvatars = ({ members, limit = 4 }) => {
   return (
@@ -8,9 +8,9 @@ const OverlappingAvatars = ({ members, limit = 4 }) => {
           key={index}
           className="relative rounded-full overflow-hidden border-2 border-white"
           style={{
-            width: '40px',
-            height: '40px',
-            marginLeft: index > 0 ? '-15px' : '0',
+            width: "40px",
+            height: "40px",
+            marginLeft: index > 0 ? "-17px" : "0",
             zIndex: members.length - index,
           }}
         >
@@ -24,11 +24,10 @@ const OverlappingAvatars = ({ members, limit = 4 }) => {
       {members.length > limit && (
         <div
           className="relative rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600"
-          
           style={{
-            width: '40px',
-            height: '40px',
-            marginLeft: '-10px',
+            width: "40px",
+            height: "40px",
+            marginLeft: "-10px",
             zIndex: 0,
           }}
         >

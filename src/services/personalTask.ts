@@ -20,12 +20,22 @@ export const getPersonalTasks = async () => {
     }
 }
 
+
+export const delelePersonalTask = async (personalTaskId: string) => {
+    try {
+        const response = await api.delete(`/personalTask/${personalTaskId}`)
+        return response.data
+    } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to delete Task');   
+    }
+}
+
 export const createSubtask = async (personalTaskId: string, subtaskData: CreateSubTaskInput) => {
     try {
         const response = await api.post(`/personalTask/${personalTaskId}`, subtaskData)
         return response.data.task
     } catch (error) {
-        throw new Error(error instanceof  Error ? error.message : 'Failed to create subtask');
+        throw new Error(error instanceof Error ? error.message : 'Failed to create subtask');
     }
 }
 

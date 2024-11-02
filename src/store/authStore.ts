@@ -85,17 +85,6 @@ export const useAuthStore = create<AuthState>(
 
         },
 
-
-        // Load authentication state from localStorage when app starts
-        // loadAuthFromStorage: () => {
-        //     const userData = localStorage.getItem("user");
-        //     const isAuthenticated = localStorage.getItem("isAuthenticated");
-
-        //     if (userData && isAuthenticated === "true") {
-        //         set({ user: JSON.parse(userData), isAuthenticated: true });
-        //     }   
-        // },
-
         loadAuthFromStorage: () => {
             const token = getToken();
             const userData = getUser();

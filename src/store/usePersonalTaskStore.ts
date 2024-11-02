@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { createPersonalTask, getPersonalTasks, updateSubtask, createSubtask, deleteSubtask } from "@/services/personalTask"
+import { createPersonalTask, getPersonalTasks, updateSubtask, createSubtask, deleteSubtask, delelePersonalTask } from "@/services/personalTask"
 
 import { PersonalTask, CreatePersonalTaskInput } from "@/types/PTask"
 
@@ -10,6 +10,7 @@ interface PersonalTaskState {
     error: string | null;
     fetchTasks: () => Promise<void>;
     addTask: (taskData: CreatePersonalTaskInput) => Promise<void>;
+    deletePTask: (taskId: string) => Promise<void>;
     addSubTask: (taskId: string, title: string) => Promise<void>;
     toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
     deleteSubtask: (taskId: string, subtaskId: string) => Promise<void>;
@@ -46,6 +47,37 @@ export const usePersonalTaskStore = create<PersonalTaskState>(
                 set({ error: error.message, isLoading: false });
             }
         },
+
+        deletePTask: async (taskId: string) => {
+            set({ isLoading: true, error: null });
+            try {
+                await delelePersonalTask(taskId);
+                const { tasks, currentTask } = get();
+
+                // Remove the task from the tasks array
+                const updatedTasks = tasks.filter(task => task._id !== taskId);
+
+                // If the deleted task was the current task, reset currentTask to null
+                if (currentTask && currentTask._id === taskId) {
+                    set({
+                        tasks: updatedTasks,
+                        currentTask: null,
+                        isLoading: false
+                    });
+                } else {
+                    set({
+                        tasks: updatedTasks,
+                        isLoading: false
+                    });
+                }
+            } catch (error) {
+                set({
+                    error: error instanceof Error ? error.message : 'Failed to delete task',
+                    isLoading: false
+                });
+            }
+        },
+
 
         addSubTask: async (taskId: string, title: string) => {
             // set({ isLoading: true, error: null });

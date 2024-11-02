@@ -8,10 +8,14 @@ interface PTaskCardTriggerProps {
 }
 
 export default function PTaskCardTrigger({ task }: PTaskCardTriggerProps) {
+  
+
   const { title, description, priority, subTasks = [] } = task;
 
+
+
   return (
-    <SheetTrigger asChild>
+    <SheetTrigger asChild >
       <div className="border rounded-lg p-5 flex flex-col justify-between cursor-pointer">
         <div className="  flex flex-col space-y-2">
           <TaskPriority priority={priority} />

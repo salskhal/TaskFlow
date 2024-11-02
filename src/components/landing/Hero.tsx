@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
+import { Button } from "../ui/button2";
 import Crest from "./Crest";
+
+import { ArrowRightIcon } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -21,7 +24,11 @@ export default function Hero() {
           deliver on time without overworking your team
         </p>
         <Link to="/auth">
-          <Button className="text-base md:text-lg lg:text-xl px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5">
+          <Button
+            variant="expandIcon"
+            Icon={ArrowRightIcon}
+            iconPlacement="right"
+          >
             Get started
           </Button>
         </Link>

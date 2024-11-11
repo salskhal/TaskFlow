@@ -1,3 +1,5 @@
+import { useNavigate, useParams } from "react-router-dom";
+// Test above
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CreateWorkspace from "./CreateWorkspace";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 
@@ -43,9 +45,19 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
   const { user } = useAuthStore();
   const [open, setOpen] = useState(false);
   const workspaces = user.workspaces;
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const params = useParams();
 
   const { currentWorkspace, setWorkspace } = useWorkspaceStore(); // Use Zustand to track the current workspace#
+
+  // Sync workspace from URL on mount and when URL changes
+  useEffect(() => {
+    const workspaceId = params.workspaceId || "personal";
+    if (workspaceId !== currentWorkspace) {
+      setWorkspace(workspaceId);
+    }
+  }, [params.workspaceId, currentWorkspace, setWorkspace]);
 
   // Guard clause for unauthenticated state
   if (!user) {
@@ -59,10 +71,6 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
     image: user.profile,
   };
 
-  // const getCurrentSelection = () => {
-  //   if (value === "personal") return personalSpace;
-  //   return workspaces.find((w) => w.workspaceId === value) || personalSpace;
-  // };
   const getCurrentSelection = (): WorkspaceSelection => {
     if (currentWorkspace === "personal") return personalSpace;
     return (
@@ -73,14 +81,15 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
 
   const currentSelection = getCurrentSelection();
 
-  const handleCreateWorkspace = () => {
-    setIsDialogOpen(true);
-  };
-
   const handleWorkspaceSelect = (workspaceId: string) => {
     setWorkspace(workspaceId); // Update workspace in Zustand store
     setOpen(false);
-    onWorkspaceChange(workspaceId); // Notify parent component about workspace change
+
+    // Update URL based on workspace selection
+    navigate(
+      workspaceId === "personal" ? "/dashboard" : `/dashboard/${workspaceId}`
+    );
+    onWorkspaceChange(workspaceId);
   };
 
   return (
@@ -114,10 +123,6 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
             <CommandEmpty>No workspace found.</CommandEmpty>
             <CommandGroup heading="Personal Account">
               <CommandItem
-                // onSelect={() => {
-                //   setValue("personal");
-                //   setOpen(false);
-                // }}
                 onSelect={() => handleWorkspaceSelect("personal")}
                 className="flex items-center gap-2"
               >
@@ -158,17 +163,9 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup>
-              {/* <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                }}
-              >
-                <CreateWorkspace />
-              </CommandItem> */}
-              <CommandItem onSelect={handleCreateWorkspace}>
+              <CommandItem>
                 <CreateWorkspace
                   onOpenChange={(open) => {
-                    setIsDialogOpen(open);
                     if (!open) setOpen(false);
                   }}
                 />

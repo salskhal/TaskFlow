@@ -1,5 +1,5 @@
-import { CreateWorkspaceInput } from "@/types/Workspace";
 import api from "./api"
+import { CreateWorkspaceInput } from "@/types/Workspace";
 
 
 export const createWorkspace = async (workspaceData: CreateWorkspaceInput) => {

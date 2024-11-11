@@ -1,4 +1,6 @@
 import { PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +10,71 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { useWorkspaceStore } from "@/store/workspaceStore";
+import { useToast } from "@/hooks/use-toast";
+import { CreateWorkspaceInput } from "@/types/Workspace";
 
-export default function CreateWorkspace({ onOpenChange }) {
+interface CreateWorkspaceProps {
+  onOpenChange: (open: boolean) => void;
+}
+
+// export default function CreateWorkspace() {
+export default function CreateWorkspace({
+  onOpenChange,
+}: CreateWorkspaceProps) {
+  const [name, setName] = useState("");
+  const navigate = useNavigate();
+  const { addWorkspace, setWorkspace, isLoading } = useWorkspaceStore();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim() || isLoading) return;
+
+    try {
+      const workspaceData: CreateWorkspaceInput = {
+        name: name.trim(),
+      };
+
+      const response = await addWorkspace(workspaceData);
+
+      if (!response || !response._id) {
+        throw new Error("Invalid response from server");
+      }
+
+      const workspaceId = response._id;
+      setWorkspace(workspaceId);
+      navigate(`/dashboard/${workspaceId}`);
+
+      toast({
+        title: "Workspace Created",
+        description: `Successfully created workspace "${name}"`,
+      });
+
+      // Reset form and close dialog
+      setName("");
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create workspace",
+        variant: "destructive",
+      });
+    }
+
+    // Here you would typically handle the workspace creation
+    // console.log("Creating workspace:", name);
+  };
+  const handleCancel = () => {
+    setName("");
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog onOpenChange={onOpenChange}  >
+    <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <div className="flex items-center">
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -19,28 +82,50 @@ export default function CreateWorkspace({ onOpenChange }) {
         </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] px-10">
-        <DialogHeader>
-          <DialogTitle>Create Workspace</DialogTitle>
-          <DialogDescription>
-            Add a new workspace to manange Projects and Members
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4"></div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            {/* <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input
-              id="username"
-              defaultValue="@peduarte"
-              className="col-span-3"
-            /> */}
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Create Workspace</DialogTitle>
+            <DialogDescription>
+              Add a new workspace to manage Projects and Members
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Workspace Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter workspace name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full"
+                disabled={isLoading}
+                maxLength={50}
+                required
+                autoFocus
+              />
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          {/* <Button type="submit">Save changes</Button> */}
-        </DialogFooter>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              className="mr-2"
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={!name.trim() || isLoading}
+              className="min-w-[100px]"
+            >
+              {isLoading ? "Creating..." : "Create"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

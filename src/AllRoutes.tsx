@@ -9,29 +9,50 @@ import LandingPage from "./pages/LandingPage";
 import PersonalDashboard from "./pages/Dashboard/PersonalDashboard";
 import WorkspaceDashboard from "./pages/Dashboard/WorkspaceDashboard";
 import { useAuthStore } from "./store/authStore";
+import { useWorkspaceStore } from "./store/workspaceStore";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth"  replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   return children;
 };
 
 // Redirect Authenticated User Component
+// const RedirectAuthenticatedUser = ({ children }: { children: JSX.Element }) => {
+//   const { isAuthenticated } = useAuthStore();
+
+//   if (isAuthenticated) {
+//     // If authenticated, redirect to dashboard
+//     return <Navigate to="/dashboard" replace />;
+//   }
+
+//   return children; // If not authenticated, render the public page (login, etc.)
+// };
+
+// Redirect Authenticated User Component
 const RedirectAuthenticatedUser = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated } = useAuthStore();
+  const { currentWorkspace } = useWorkspaceStore();
 
   if (isAuthenticated) {
-    // If authenticated, redirect to dashboard
-    return <Navigate to="/dashboard" replace />;
+    // If authenticated, redirect to the current workspace dashboard
+    return (
+      <Navigate
+        to={
+          currentWorkspace === "personal"
+            ? "/dashboard"
+            : `/dashboard/${currentWorkspace}`
+        }
+        replace
+      />
+    );
   }
-
-  return children; // If not authenticated, render the public page (login, etc.)
+  return children;
 };
-
 export default function AllRoutes() {
   return (
     <Routes>
@@ -60,8 +81,10 @@ export default function AllRoutes() {
           </ProtectedRoute>
         }
       >
-         <Route index element={<PersonalDashboard />} /> {/* Personal dashboard */}
-         <Route path=":workspaceId" element={<WorkspaceDashboard />} /> {/* Workspace dashboard */}
+        <Route index element={<PersonalDashboard />} />{" "}
+        {/* Personal dashboard */}
+        <Route path=":workspaceId" element={<WorkspaceDashboard />} />{" "}
+        {/* Workspace dashboard */}
       </Route>
     </Routes>
   );

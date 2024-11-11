@@ -1,3 +1,3 @@
 export interface CreateWorkspaceInput {
-    title: string
+    name: string
 }

@@ -46,6 +46,8 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
   const [open, setOpen] = useState(false);
   const workspaces = user.workspaces;
 
+  console.log(workspaces)
+
   const navigate = useNavigate();
   const params = useParams();
 
@@ -177,3 +179,204 @@ export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
     </Popover>
   );
 }
+
+
+// import { useNavigate, useParams } from "react-router-dom";
+// import { Check, ChevronsUpDown } from "lucide-react";
+// import { cn } from "@/lib/utils";
+// import { Button } from "@/components/ui/button";
+// import {
+//   Command,
+//   CommandEmpty,
+//   CommandGroup,
+//   CommandInput,
+//   CommandItem,
+//   CommandList,
+//   CommandSeparator,
+// } from "@/components/ui/command";
+// import { useAuthStore } from "@/store/authStore";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@/components/ui/popover";
+// import { useState, useEffect } from "react";
+// import CreateWorkspace from "./CreateWorkspace";
+// import { useWorkspaceStore } from "@/store/workspaceStore";
+
+// interface ComboBoxProps {
+//   onWorkspaceChange: (workspaceId: string) => void;
+// }
+
+// interface Workspace {
+//   _id: string;  // Changed from workspaceId to _id to match API response
+//   name: string;
+//   image?: string;
+// }
+
+// interface PersonalSpace {
+//   value: string;
+//   name: string;
+//   image: string;
+// }
+
+// type WorkspaceSelection = Workspace | PersonalSpace;
+
+// export default function ComboBox({ onWorkspaceChange }: ComboBoxProps) {
+//   const { user, syncUserData } = useAuthStore();  // Added syncUserData
+//   const [open, setOpen] = useState(false);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const workspaces = user?.workspaces || [];
+
+//   const navigate = useNavigate();
+//   const params = useParams();
+
+//   const { currentWorkspace, setWorkspace } = useWorkspaceStore();
+
+//   // Sync workspace from URL and fetch latest user data on mount
+//   useEffect(() => {
+//     const initializeWorkspace = async () => {
+//       const workspaceId = params.workspaceId || "personal";
+//       if (workspaceId !== currentWorkspace) {
+//         setWorkspace(workspaceId);
+//       }
+
+//       // Sync user data when component mounts
+//       try {
+//         setIsLoading(true);
+//         await syncUserData();
+//       } catch (error) {
+//         console.error("Failed to sync user data:", error);
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     initializeWorkspace();
+//   }, [params.workspaceId, currentWorkspace, setWorkspace, syncUserData]);
+
+//   // Guard clause for unauthenticated state
+//   if (!user) {
+//     return null;
+//   }
+
+//   const personalSpace = {
+//     value: "personal",
+//     name: `${user.firstName} ${user.lastName}`,
+//     image: user.profile,
+//   };
+
+//   const getCurrentSelection = (): WorkspaceSelection => {
+//     if (currentWorkspace === "personal") return personalSpace;
+//     return (
+//       workspaces.find((w) => w._id === currentWorkspace) ||  // Changed from workspaceId to _id
+//       personalSpace
+//     );
+//   };
+
+//   const currentSelection = getCurrentSelection();
+
+//   const handleWorkspaceSelect = async (workspaceId: string) => {
+//     setWorkspace(workspaceId);
+//     setOpen(false);
+
+//     try {
+//       // Sync user data when switching workspaces to ensure we have latest data
+//       await syncUserData();
+//     } catch (error) {
+//       console.error("Failed to sync user data:", error);
+//     }
+
+//     // Update URL based on workspace selection
+//     navigate(
+//       workspaceId === "personal" ? "/dashboard" : `/dashboard/${workspaceId}`
+//     );
+//     onWorkspaceChange(workspaceId);
+//   };
+
+//   return (
+//     <Popover open={open} onOpenChange={setOpen}>
+//       <PopoverTrigger asChild>
+//         <Button
+//           variant="outline"
+//           role="combobox"
+//           aria-expanded={open}
+//           className="w-[250px] justify-between"
+//           disabled={isLoading}
+//         >
+//           <div className="flex items-center gap-2">
+//             {"image" in currentSelection ? (
+//               <img
+//                 src={currentSelection.image}
+//                 alt={currentSelection.name}
+//                 className="w-4 h-4 rounded-full"
+//               />
+//             ) : (
+//               <div className="w-4 h-4 rounded-full bg-gray-300" />
+//             )}
+//             {isLoading ? "Loading..." : currentSelection.name}
+//           </div>
+//           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+//         </Button>
+//       </PopoverTrigger>
+//       <PopoverContent className="w-[250px] p-0">
+//         <Command>
+//           <CommandInput placeholder="Search Workspace..." />
+//           <CommandList>
+//             <CommandEmpty>No workspace found.</CommandEmpty>
+//             <CommandGroup heading="Personal Account">
+//               <CommandItem
+//                 onSelect={() => handleWorkspaceSelect("personal")}
+//                 className="flex items-center gap-2"
+//               >
+//                 <img
+//                   src={user.profile}
+//                   alt={user.firstName}
+//                   className="w-4 h-4 rounded-full"
+//                 />
+//                 {user.firstName} {user.lastName}
+//                 <Check
+//                   className={cn(
+//                     "ml-auto h-4 w-4",
+//                     currentWorkspace === "personal"
+//                       ? "opacity-100"
+//                       : "opacity-0"
+//                   )}
+//                 />
+//               </CommandItem>
+//             </CommandGroup>
+//             <CommandSeparator />
+//             <CommandGroup heading="Workspaces">
+//               {workspaces.map((workspace) => (
+//                 <CommandItem
+//                   key={workspace._id}  // Changed from workspaceId to _id
+//                   onSelect={() => handleWorkspaceSelect(workspace._id)}  // Changed from workspaceId to _id
+//                 >
+//                   {workspace.name}
+//                   <Check
+//                     className={cn(
+//                       "ml-auto h-4 w-4",
+//                       currentWorkspace === workspace._id  // Changed from workspaceId to _id
+//                         ? "opacity-100"
+//                         : "opacity-0"
+//                     )}
+//                   />
+//                 </CommandItem>
+//               ))}
+//             </CommandGroup>
+//             <CommandSeparator />
+//             <CommandGroup>
+//               <CommandItem>
+//                 <CreateWorkspace
+//                   onOpenChange={(open) => {
+//                     if (!open) setOpen(false);
+//                   }}
+//                 />
+//               </CommandItem>
+//             </CommandGroup>
+//           </CommandList>
+//         </Command>
+//       </PopoverContent>
+//     </Popover>
+//   );
+// }

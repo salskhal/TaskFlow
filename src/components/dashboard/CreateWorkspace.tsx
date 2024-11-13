@@ -47,6 +47,7 @@ export default function CreateWorkspace({
 
       const workspaceId = response._id;
       setWorkspace(workspaceId);
+      
       navigate(`/dashboard/${workspaceId}`);
 
       toast({
@@ -65,8 +66,6 @@ export default function CreateWorkspace({
       });
     }
 
-    // Here you would typically handle the workspace creation
-    // console.log("Creating workspace:", name);
   };
   const handleCancel = () => {
     setName("");

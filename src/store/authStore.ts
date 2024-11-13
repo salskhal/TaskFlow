@@ -1,13 +1,11 @@
 import { create } from "zustand"
 import {
-    // registerUser,
-    // verifyOTP,
-    loginUser, logout
+    loginUser, logout, fetchCurrentUser
 } from "@/services/auth"
 
 import { User } from "@/types/PTask";
 import { useWorkspaceStore } from "./workspaceStore";
-import { getToken, getUser } from "@/utils/tokenStorage";
+import { getToken, getUser, setUser } from "@/utils/tokenStorage";
 
 interface AuthState {
     user: User | null;
@@ -21,6 +19,10 @@ interface AuthState {
     login: (email: string, password: string) => Promise<void>;
     logoutUser: () => void;
     loadAuthFromStorage: () => void; // Function to load auth from localStorage
+
+    // New
+    updateUserData: (userData: Partial<User>) => void;
+    syncUserData: () => Promise<void> // New method to sync user data
 }
 
 
@@ -38,24 +40,12 @@ export const useAuthStore = create<AuthState>(
 
         // Register user action
         register: async () => {
-            // set({ loading: true, error: null, registrationSuccess: false });
-            // try {
-            //     await registerUser(data);
-            //     set({ registrationSuccess: true, loading: false });
-            // } catch (error: any) {
-            //     set({ error: error.message, loading: false });
-            // }
+
         },
 
         // OTP verification action
         verifyOTP: async () => {
-            // set({ loading: true, error: null, verificationSuccess: false });
-            // try {
-            //     await verifyOTP({ email, otp });
-            //     set({ verificationSuccess: true, loading: false });
-            // } catch (error: any) {
-            //     set({ error: error.message, loading: false });
-            // }
+
         },
 
 
@@ -65,10 +55,6 @@ export const useAuthStore = create<AuthState>(
             try {
                 const userData = await loginUser({ email, password });
                 set({ user: userData, isAuthenticated: true, loading: false });
-
-                // Save user data to localStorage
-                // localStorage.setItem("user", JSON.stringify(userData));
-                // localStorage.setItem("isAuthenticated", "true");
                 console.log(userData)
             } catch (error) {
                 set({ error: error.message, loading: false });
@@ -94,6 +80,35 @@ export const useAuthStore = create<AuthState>(
             } else {
                 // If either token or user data is missing, clear everything
                 set({ user: null, isAuthenticated: false });
+            }
+        },
+
+
+        // New
+        updateUserData: (userData: Partial<User>) => {
+            set((state) => {
+                const updatedUser = state.user ? { ...state.user, ...userData } : null
+                if (updatedUser) {
+                    setUser(updatedUser) // Update local storage
+                }
+                return { user: updatedUser }
+            })
+        },
+
+        syncUserData: async () => {
+            set({ loading: true, error: null })
+            try {
+                const userData = await fetchCurrentUser()
+                if (userData) {
+                    setUser(userData) // Update local storage
+                    set({ user: userData, loading: false })
+                }
+            } catch (error) {
+                set({
+                    error: error instanceof Error ? error.message : 'Failed to sync user data',
+                    loading: false
+                })
+                throw error
             }
         },
 

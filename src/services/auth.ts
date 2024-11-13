@@ -15,6 +15,16 @@ export const registerUser = async (data: {
     }
 }
 
+
+export const fetchCurrentUser = async () => {
+    try {
+        const response = await api.get('/users/profile')
+        return response.data.user
+    } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to fetch user data')
+    }
+}   
+
 export const verifyOTP = async (data: {
     email: string,
     otp: string

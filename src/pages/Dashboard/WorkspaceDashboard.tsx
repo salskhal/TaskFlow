@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { fetchUserWorkspaceById } from "@/services/workspaces";
 import { Button } from "@/components/ui/button";
-import WorkspaceMemberDisplay from "@/components/dashboard/Workspace/WorkspaceMemberDisplay";
+// import WorkspaceMemberDisplay from "@/components/dashboard/Workspace/WorkspaceMemberDisplay";
+import Sidebar from "@/components/dashboard/Workspace/Sidebar";
+import MobileNav from "@/components/dashboard/Workspace/MobileNav";
 
 export default function WorkspaceDashboard() {
   const { workspaceId } = useParams(); // Get the workspace ID from the URL
@@ -29,31 +31,51 @@ export default function WorkspaceDashboard() {
     fetchWorkspace(); // Call the fetch function
   }, [workspaceId]);
 
-  const handleClick = () => {
-    console.log(workspaceData);
-  };
+  // const handleClick = () => {
+  //   console.log(workspaceData);
+  // };
 
   // Render loading, error, or workspace data
   if (loading) return <p>Loading workspace...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <main className="p-10">
-      <div className="flex items-center justify-between">
-        <h1 className="font-bold text-4xl">{workspaceData.name} Dashboard</h1>
-        <Button onClick={handleClick}>Create Project</Button>
+    // <main className="p-10">
+    //   <div className="flex items-center justify-between">
+    //     <h1 className="font-bold text-4xl">{workspaceData.name} Dashboard</h1>
+    //     <Button onClick={handleClick}>Create Project</Button>
+    //   </div>
+    //   <p>Currently viewing workspace: {workspaceId}</p>
+    //   {/* Display workspace-specific content */}
+    //   {workspaceData.name}
+
+    //   <Sidebar />
+
+    //   {/* {workspaceData.members.map((member) => (
+    //     <div>
+    //       <img src={member.profile} alt="me" />
+    //     </div>
+    //   ))} */}
+
+    //   {/* <Outlet /> */}
+
+    //   <WorkspaceMemberDisplay workspaceData={workspaceData} />
+    // </main>
+    <div className="flex h-full">
+      {/* Mobile Navigation - Only shown in workspace view */}
+      <div className="lg:hidden fixed top-16 left-0 p-4 z-50">
+        <MobileNav />
       </div>
-      <p>Currently viewing workspace: {workspaceId}</p>
-      {/* Display workspace-specific content */}
-      {workspaceData.name}
 
-      {/* {workspaceData.members.map((member) => (
-        <div>
-          <img src={member.profile} alt="me" />
-        </div>
-      ))} */}
+      {/* Desktop Sidebar - Only shown in workspace view */}
+      <div className="hidden lg:block">
+        <Sidebar />
+      </div>
 
-      <WorkspaceMemberDisplay workspaceData={workspaceData} />
-    </main>
+      {/* Main Content */}
+      <main className="flex-1 p-4">
+        <Outlet />
+      </main>
+    </div>
   );
 }

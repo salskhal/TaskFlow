@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import LandingPage from "./pages/LandingPage";
 import PersonalDashboard from "./pages/Dashboard/PersonalDashboard";
 import WorkspaceDashboard from "./pages/Dashboard/WorkspaceDashboard";
+import ProjectDetails from "./components/dashboard/Workspace/ProjectDetails";
 import { useAuthStore } from "./store/authStore";
 import { useWorkspaceStore } from "./store/workspaceStore";
 
@@ -20,18 +21,6 @@ const ProtectedRoute = ({ children }) => {
 
   return children;
 };
-
-// Redirect Authenticated User Component
-// const RedirectAuthenticatedUser = ({ children }: { children: JSX.Element }) => {
-//   const { isAuthenticated } = useAuthStore();
-
-//   if (isAuthenticated) {
-//     // If authenticated, redirect to dashboard
-//     return <Navigate to="/dashboard" replace />;
-//   }
-
-//   return children; // If not authenticated, render the public page (login, etc.)
-// };
 
 // Redirect Authenticated User Component
 const RedirectAuthenticatedUser = ({ children }: { children: JSX.Element }) => {
@@ -83,7 +72,9 @@ export default function AllRoutes() {
       >
         <Route index element={<PersonalDashboard />} />{" "}
         {/* Personal dashboard */}
-        <Route path=":workspaceId" element={<WorkspaceDashboard />} />{" "}
+        <Route path=":workspaceId" element={<WorkspaceDashboard />}>
+          <Route path="projects/:projectId" element={<ProjectDetails />} />
+        </Route>
         {/* Workspace dashboard */}
       </Route>
     </Routes>
